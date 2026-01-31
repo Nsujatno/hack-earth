@@ -32,3 +32,9 @@ class UserSurveyInput(BaseModel):
     income_range: str | None = None
 
 
+
+class AgentRoadmap(BaseModel):
+    user_id: str
+    roadmap_data: dict
+    summary: str | None = None
+    total_savings: float | None = None

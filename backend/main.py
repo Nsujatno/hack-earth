@@ -71,11 +71,24 @@ def save_survey(survey: UserSurveyInput, user = Depends(get_current_user)):
 from agent.graph import app as agent_app
 
 @app.post('/roadmap')
-def generate_roadmap_endpoint(survey: UserSurveyInput):
+def generate_roadmap_endpoint(survey: UserSurveyInput, user = Depends(get_current_user)):
     """
     Trigger the AI Agent to generate a roadmap based on survey data.
     """
     try:
+        # User extraction logic
+        if isinstance(user, tuple):
+            user_obj = user[0]
+        else:
+            user_obj = user
+
+        if hasattr(user_obj, "user") and user_obj.user:
+            user_id = user_obj.user.id
+        elif hasattr(user_obj, "id"):
+             user_id = user_obj.id
+        else:
+            raise HTTPException(status_code=400, detail=f"Could not extract user ID from {type(user_obj)}")
+        
         print(f"Starting Agent for {survey.zip_code}...")
         
         # Initialize state
@@ -90,8 +103,18 @@ def generate_roadmap_endpoint(survey: UserSurveyInput):
         
         # Run Graph
         result = agent_app.invoke(initial_state)
+        roadmap = result.get("final_roadmap")
         
-        return result.get("final_roadmap")
+        if roadmap:
+            from db import save_roadmap
+            # Extract summary and savings for easier querying
+            summary_text = roadmap.get("summary_text", "")
+            total_savings = roadmap.get("total_projected_savings_yearly", 0)
+            
+            save_roadmap(user_id, roadmap, summary_text, total_savings)
+            print(f"Roadmap saved for user {user_id}")
+        
+        return roadmap
     except Exception as e:
         print(f"Agent Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

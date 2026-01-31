@@ -30,3 +30,20 @@ def get_current_user(authorization: str = Header(...)):
         return user
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def save_roadmap(user_id: str, roadmap: dict, summary: str = None, total_savings: float = None):
+    try:
+        data = {
+            "user_id": user_id,
+            "roadmap_data": roadmap,
+            "summary": summary,
+            "total_savings": total_savings
+        }
+        response = supabase.table("agent_roadmaps").insert(data).execute()
+        return response
+    except Exception as e:
+        print(f"Error saving roadmap: {e}")
+        # We don't necessarily want to fail the whole request if saving fails, but logging is good.
+        # Ideally, we should maybe re-raise or handle. For now, let's print.
+        raise e
