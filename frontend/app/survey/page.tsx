@@ -8,11 +8,12 @@ import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { SelectionCard } from "@/components/ui/SelectionCard";
 import { Select } from "@/components/ui/Select";
-import { ArrowLeft, ArrowRight, Home, Building, Banknote, Flame, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home, Building, Banknote, Flame, Users, Loader2 } from "lucide-react";
 
 export default function SurveyPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
   const totalSteps = 6;
 
   // Form State
@@ -85,11 +86,34 @@ export default function SurveyPage() {
       }
 
       console.log("Survey submitted successfully");
+      
+      // Start generating roadmap
+      setIsGenerating(true);
+      
+      const roadmapRes = await fetch("http://localhost:8000/roadmap", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!roadmapRes.ok) {
+          console.error("Failed to generate roadmap");
+          // We still redirect to dashboard, maybe show an error toast there or allow retry?
+          // For now, let's just proceed as the user data is saved.
+      } else {
+          console.log("Roadmap generated successfully");
+      }
+
       router.push("/dashboard");
     } catch (error) {
       console.error("Error submitting survey:", error);
+      setIsGenerating(false);
     }
   };
+
 
   // Step Validation (Basic)
   const isStepValid = () => {
@@ -358,6 +382,19 @@ export default function SurveyPage() {
 
         </div>
       </Card>
+      
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
+            <div className="bg-card-background border border-border/60 p-8 rounded-xl shadow-2xl flex flex-col items-center gap-4 max-w-sm text-center">
+                <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-text-primary">Designing Your Roadmap</h3>
+                    <p className="text-text-secondary">Our AI is analyzing your home profile to find the best rebates and savings...</p>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -154,37 +154,58 @@ def generate_roadmap(state: AgentState) -> Dict:
     
     parser = JsonOutputParser(pydantic_object=RoadmapOutput)
     
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are GreenGain, an expert energy advisor. Return purely JSON."),
-        ("human", """
+ROADMAP_PROMPT_TEMPLATE = """
         User Profile: {profile}
         
         Context:
         {context}
         
         Task:
-        Generate a personalized energy roadmap JSON.
+        Generate a personalized energy roadmap JSON data structure.
         
-        CRITICAL LOGIC RULES:
-        1. URL CHECK: Map SPECIFIC URLs to their upgrades. Do NOT use a Water Heater URL for a Weatherization recommendation.
-        2. MATH CHECK: For "Total Rebate", you MUST sum the Federal Tax Credit (IRS 25C) AND Local Utility Rebates.
-           Example: Heat Pump = $2,000 (Fed) + $2,500 (Austin) = $4,500 Total.
-        3. INCOME CHECK: 
-           - If Income > $60,000: Do NOT recommend "Free Weatherization". Recommend "Home Performance Rebates" (Insulation/Air Sealing) instead.
-           - If Income < $60,000: Recommend "Weatherization Assistance Program".
-        4. LINK FALLBACK: If specific URL is missing, use: "https://savings.austinenergy.com/rebates/residential-rebates"
+        CRITICAL FINANCIAL LOGIC RULES (STRICT COMPLIANCE REQUIRED):
+        1. IRS 25C BASIS REDUCTION: 
+           - You MUST subtract any "Utility Rebates" or "Public Grants" (like HEEHRA) from the "Estimated Cost" BEFORE calculating the Federal Tax Credit.
+           - Formula: Federal Credit = 30% * (Estimated Cost - Utility Rebate - HEEHRA Rebate).
+           - Tax Credit Cap: Max $2,000/yr for Heat Pumps/Biomass/Boilers. Max $1,200/yr for everything else combined (Windows, Doors, Insulation, Electrical).
+        
+        2. HEEHRA INCOME TIERS (Rebate Caps):
+           - Look at User Income.
+           - LOW INCOME (<80% Area Median Income): 100% of project cost covered (up to $14k).
+           - MODERATE INCOME (80-150% AMI): ONLY 50% of project cost covered (up to $14k).
+           - HIGH INCOME (>150% AMI): $0 HEEHRA rebate.
+           - RULE: If Income is >$50k and single/small household, or if unknown, ASSUME MODERATE INCOME (50% coverage). DO NOT promise 100% coverage unless you are certain they are Low Income.
+        
+        3. NON-REFUNDABLE WARNING:
+           - You MUST include a warning field or text stating: "Federal Tax Credits (25C) are non-refundable. You must have enough tax liability to claim them. They do not carry over."
+        
+        4. SPECIFICITY & CONSERVATISM:
+           - If a specific rebate amount is ambiguous, choose the LOWER expected amount.
+           - Do NOT double count incentives.
+           
+        5. URL CHECK: Map SPECIFIC URLs to their upgrades.
         
         Steps:
         1. Identify "Quick Wins" (Low cost).
         2. Identify "Big Bets" (Major upgrades).
         3. Estimate ROI Years.
         4. Calculate total projected yearly savings.
-        5. EXTRACT URLs strictly checking Rule #1.
-
-
+        5. EXTRACT URLs strictly.
         
         {format_instructions}
-        """)
+        """
+
+def generate_roadmap(state: AgentState) -> Dict:
+    """Generate the final JSON roadmap."""
+    print("Generating Roadmap...")
+    profile = state["user_profile"]
+    context = "\n".join([str(d) for d in state["documents"]])
+    
+    parser = JsonOutputParser(pydantic_object=RoadmapOutput)
+    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are GreenGain, a STRICT expert energy financial advisor. Return purely JSON."),
+        ("human", ROADMAP_PROMPT_TEMPLATE)
     ])
     
     chain = prompt | llm | parser
