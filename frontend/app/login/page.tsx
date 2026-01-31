@@ -35,7 +35,7 @@ export default function LoginPage() {
 
       if (data.session?.access_token) {
         localStorage.setItem("access_token", data.session.access_token);
-        router.push("/");
+        router.push("/survey");
       } else {
         throw new Error("No access token received");
       }
