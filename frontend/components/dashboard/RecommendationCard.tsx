@@ -38,13 +38,21 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                     <div className="font-semibold text-text-primary">${recommendation.estimated_cost}</div>
                 </div>
                 <div>
-                    <div className="text-xs text-text-secondary mb-1">Rebate Value</div>
-                    <div className="font-semibold text-success flex items-center gap-1">
-                        ${recommendation.rebate_amount + recommendation.federal_credit}
-                        {(recommendation.rebate_amount > 0 || recommendation.federal_credit > 0) && (
-                            <span className="text-[10px] bg-success/10 px-1 rounded">AVAILABLE</span>
-                        )}
-                    </div>
+                    {(() => {
+                        const fundingData = recommendation.funding_breakdown || [];
+                        const totalSavings = fundingData.reduce((sum, item) => sum + item.amount, 0);
+                        return (
+                            <>
+                                <div className="text-xs text-text-secondary mb-1">Rebate Value</div>
+                                <div className="font-semibold text-success flex items-center gap-1">
+                                    ${totalSavings}
+                                    {totalSavings > 0 && (
+                                        <span className="text-[10px] bg-success/10 px-1 rounded">AVAILABLE</span>
+                                    )}
+                                </div>
+                            </>
+                        );
+                    })()}
                 </div>
 
                 {recommendation.roi_years !== undefined && recommendation.roi_years > 0 && (
@@ -62,7 +70,11 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
                 <Button
                     variant="secondary"
                     fullWidth
-                    onClick={() => window.open(recommendation.learn_more_url, '_blank')}
+                    disabled={!(recommendation.funding_breakdown?.some(f => f.url))}
+                    onClick={() => {
+                        const firstUrl = recommendation.funding_breakdown?.find(f => f.url)?.url;
+                        if (firstUrl) window.open(firstUrl, '_blank');
+                    }}
                 >
                     View Details
                 </Button>

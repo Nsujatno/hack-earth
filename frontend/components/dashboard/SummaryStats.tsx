@@ -3,12 +3,14 @@ import { useCountUp } from "@/hooks/useCountUp";
 
 interface SummaryStatsProps {
     totalSavings: number;
+    recommendationCount: number;
+    potentialRebates: number;
 }
 
-export function SummaryStats({ totalSavings }: SummaryStatsProps) {
+export function SummaryStats({ totalSavings, recommendationCount, potentialRebates }: SummaryStatsProps) {
     const animatedSavings = useCountUp(totalSavings);
-    const animatedRecommendations = useCountUp(5);
-    const animatedRebates = useCountUp(850);
+    const animatedRecommendations = useCountUp(recommendationCount);
+    const animatedRebates = useCountUp(potentialRebates);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -31,9 +33,6 @@ export function SummaryStats({ totalSavings }: SummaryStatsProps) {
                     <div className="flex items-baseline gap-1">
                         <span className="text-4xl font-bold tracking-tight text-text-primary">{animatedRecommendations}</span>
                     </div>
-                    <p className="text-xs mt-2 text-text-secondary">
-                        2 Quick Wins available
-                    </p>
                 </div>
             </Card>
 

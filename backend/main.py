@@ -120,3 +120,30 @@ def generate_roadmap_endpoint(survey: UserSurveyInput, user = Depends(get_curren
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+@app.get('/dashboard')
+def get_dashboard_data(user = Depends(get_current_user)):
+    try:
+        # User extraction logic (reused)
+        if isinstance(user, tuple):
+             user_obj = user[0]
+        else:
+             user_obj = user
+
+        if hasattr(user_obj, "user") and user_obj.user:
+            user_id = user_obj.user.id
+        elif hasattr(user_obj, "id"):
+             user_id = user_obj.id
+        else:
+            raise HTTPException(status_code=400, detail=f"Could not extract user ID")
+
+        from db import get_roadmap
+        data = get_roadmap(user_id)
+        
+        if not data:
+            return {"roadmap_data": None}
+            
+        return data
+    except Exception as e:
+        print(f"Dashboard Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

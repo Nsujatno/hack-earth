@@ -175,6 +175,7 @@ ROADMAP_PROMPT_TEMPLATE = """
            - MODERATE INCOME (80-150% AMI): ONLY 50% of project cost covered (up to $14k).
            - HIGH INCOME (>150% AMI): $0 HEEHRA rebate.
            - RULE: If Income is >$50k and single/small household, or if unknown, ASSUME MODERATE INCOME (50% coverage). DO NOT promise 100% coverage unless you are certain they are Low Income.
+           - **AVAILABILITY CHECK**: If the state (e.g. Texas) does not have HEEHRA active yet, or if you mark it as a "future_grant", you MUST explicitly advise the user to "WAIT TO BUY" in the item description. Make it clear they will miss the money if they buy now.
         
         3. NON-REFUNDABLE WARNING:
            - You MUST include a warning field or text stating: "Federal Tax Credits (25C) are non-refundable. You must have enough tax liability to claim them. They do not carry over."
@@ -183,14 +184,20 @@ ROADMAP_PROMPT_TEMPLATE = """
            - If a specific rebate amount is ambiguous, choose the LOWER expected amount.
            - Do NOT double count incentives.
            
-        5. URL CHECK: Map SPECIFIC URLs to their upgrades.
-        
+        5. URL CHECK: Map SPECIFIC URLs to their funding sources in the breakdown.
+           - **HEEHRA FALLBACK**: If you cannot find a specific state application link for HEEHRA, you MUST use "https://www.energy.gov/save/home-upgrades". DO NOT return a broken or hallucinated link.
+           
+        6. DE-COUPLE COMBINED TOTALS:
+           - If you find a total savings of $2,800 that consists of an $800 utility check and a $2,000 tax credit, do NOT sum them. 
+           - Output them as two separate objects in the `funding_breakdown` list.
+           - For Federal Tax Credits (IRA/25C), always link to the official EnergyStar.gov or IRS.gov page.
+           
         Steps:
         1. Identify "Quick Wins" (Low cost).
         2. Identify "Big Bets" (Major upgrades).
-        3. Estimate ROI Years.
-        4. Calculate total projected yearly savings.
-        5. EXTRACT URLs strictly.
+        3. EXTRACT detailed funding breakdown for each item.
+        4. Estimate ROI Years.
+        5. Calculate total projected yearly savings.
         
         {format_instructions}
         """
@@ -222,10 +229,16 @@ def generate_roadmap(state: AgentState) -> Dict:
 
         for rec in response.get("recommendations", []):
             if rec["type"] == "big_bet" and rec["estimated_cost"] > 0:
+                # Calculate derived totals for ROI logic
+                funding = rec.get("funding_breakdown", [])
+                
+                total_rebate = sum(f["amount"] for f in funding if f["source_type"] in ["instant_rebate", "future_grant"])
+                total_credit = sum(f["amount"] for f in funding if f["source_type"] == "tax_credit")
+                
                 metrics = calculate_roi(
                     rec["estimated_cost"], 
-                    rec["rebate_amount"], 
-                    rec["federal_credit"], 
+                    total_rebate,
+                    total_credit, 
                     rec["estimated_monthly_savings"]
                 )
                 rec["roi_years"] = metrics["roi_years"]

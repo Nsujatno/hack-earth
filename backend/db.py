@@ -47,3 +47,19 @@ def save_roadmap(user_id: str, roadmap: dict, summary: str = None, total_savings
         # We don't necessarily want to fail the whole request if saving fails, but logging is good.
         # Ideally, we should maybe re-raise or handle. For now, let's print.
         raise e
+
+def get_roadmap(user_id: str):
+    try:
+        response = supabase.table("agent_roadmaps") \
+            .select("*") \
+            .eq("user_id", user_id) \
+            .order("created_at", desc=True) \
+            .limit(1) \
+            .execute()
+        
+        if response.data and len(response.data) > 0:
+            return response.data[0]
+        return None
+    except Exception as e:
+        print(f"Error fetching roadmap: {e}")
+        return None
