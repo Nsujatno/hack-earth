@@ -9,8 +9,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Hack Days",
+  title: "GreenGain",
   description: "Soft Analog Design System Demo",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
