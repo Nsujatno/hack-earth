@@ -12,6 +12,8 @@ requests
 pypdf
 langchain-google-genai
 tavily-python
+langgraph
+
 
 
 

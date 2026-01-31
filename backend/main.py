@@ -46,6 +46,7 @@ def login(credentials: UserCredentials):
 @app.post('/survey')
 def save_survey(survey: UserSurveyInput, user = Depends(get_current_user)):
     try:
+        # User extraction logic...
         if isinstance(user, tuple):
             user_obj = user[0]
         else:
@@ -66,4 +67,33 @@ def save_survey(survey: UserSurveyInput, user = Depends(get_current_user)):
     except Exception as e:
         print(f"Error in save_survey: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
+
+from agent.graph import app as agent_app
+
+@app.post('/roadmap')
+def generate_roadmap_endpoint(survey: UserSurveyInput):
+    """
+    Trigger the AI Agent to generate a roadmap based on survey data.
+    """
+    try:
+        print(f"Starting Agent for {survey.zip_code}...")
+        
+        # Initialize state
+        initial_state = {
+            "user_profile": survey.model_dump(),
+            "observations": [],
+            "search_queries": [],
+            "documents": [],
+            "retry_count": 0,
+            "final_roadmap": None
+        }
+        
+        # Run Graph
+        result = agent_app.invoke(initial_state)
+        
+        return result.get("final_roadmap")
+    except Exception as e:
+        print(f"Agent Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
