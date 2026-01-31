@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F9F8F4;
+  --card-background: #FFFFFF;
+  --sub-background: #E5E0D8;
+  
+  --primary: #8DA399;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #7A8F85;
+  
+  --secondary: #D4C5A3;
+  --secondary-foreground: #1A2F23;
+  
+  --success: #4F772D;
+  --success-foreground: #FFFFFF;
+
+  --text-primary: #1A2F23;
+  --text-secondary: #5C6660;
+  
+  --border: #E5E0D8;
+  --ring: #8DA399;
+  
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-card-background: var(--card-background);
+  --color-sub-background: var(--sub-background);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  
+  --radius-card: var(--radius-xl);
+  
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
