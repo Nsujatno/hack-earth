@@ -11,5 +11,7 @@ beautifulsoup4
 requests
 pypdf
 langchain-google-genai
+tavily-python
+
 
 

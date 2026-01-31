@@ -13,10 +13,11 @@ import { ArrowLeft, ArrowRight, Home, Building, Banknote, Flame, Users } from "l
 export default function SurveyPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   // Form State
   const [formData, setFormData] = useState({
+    name: "",
     zipCode: "",
     ownership: "",
     homeType: "",
@@ -47,18 +48,58 @@ export default function SurveyPage() {
 
   const submitSurvey = async () => {
     console.log("Submitting Survey Data:", formData);
-    // TODO: Send to backend
-    router.push("/dashboard");
+
+    const payload = {
+      name: formData.name,
+      zip_code: formData.zipCode,
+      ownership_status: formData.ownership,
+      home_type: formData.homeType,
+      monthly_electric_bill: formData.billElectric ? parseFloat(formData.billElectric) : null,
+      monthly_gas_bill: formData.billGas ? parseFloat(formData.billGas) : null,
+      heating_system: formData.heatingSystem,
+      home_age_year: formData.homeAge ? parseInt(formData.homeAge) : null,
+      income_range: formData.incomeRange
+    };
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        console.error("No access token found");
+        // Redirect to login or handle error
+        router.push("/login");
+        return;
+      }
+
+      const res = await fetch("http://localhost:8000/survey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Failed to submit survey");
+      }
+
+      console.log("Survey submitted successfully");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error submitting survey:", error);
+    }
   };
 
   // Step Validation (Basic)
   const isStepValid = () => {
     switch (step) {
-      case 1: return formData.zipCode.length >= 5;
-      case 2: return formData.ownership && formData.homeType;
-      case 3: return true;
-      case 4: return formData.heatingSystem && formData.homeAge;
-      case 5: return formData.incomeRange;
+      case 1: return formData.name.length > 0;
+      case 2: return formData.zipCode.length >= 5;
+      case 3: return formData.ownership && formData.homeType;
+      case 4: return true;
+      case 5: return formData.heatingSystem && formData.homeAge;
+      case 6: return formData.incomeRange;
       default: return false;
     }
   };
@@ -79,8 +120,29 @@ export default function SurveyPage() {
         <div className="p-6 sm:p-8 pt-2 min-h-[400px] flex flex-col">
           
           <div className="flex-1 space-y-6">
-            {/* Step 1: Location */}
+            {/* Step 1: Name */}
             {step === 1 && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold text-text-primary">What's your name?</h2>
+                  <p className="text-text-secondary">Let's get to know you first.</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-text-primary">Name</label>
+                  <Input
+                    id="name"
+                    placeholder="Your Name"
+                    value={formData.name}
+                    onChange={(e) => updateData("name", e.target.value)}
+                    className="text-lg"
+                    autoFocus
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Location */}
+            {step === 2 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-text-primary">Where is your home?</h2>
@@ -102,8 +164,8 @@ export default function SurveyPage() {
               </div>
             )}
 
-            {/* Step 2: Property Type */}
-            {step === 2 && (
+            {/* Step 3: Property Type */}
+            {step === 3 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-text-primary">Tell us about your home.</h2>
@@ -168,8 +230,8 @@ export default function SurveyPage() {
               </div>
             )}
 
-            {/* Step 3: Usage */}
-            {step === 3 && (
+            {/* Step 4: Usage */}
+            {step === 4 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                  <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-text-primary">Energy Usage</h2>
@@ -209,8 +271,8 @@ export default function SurveyPage() {
               </div>
             )}
 
-            {/* Step 4: Systems & Age */}
-            {step === 4 && (
+            {/* Step 5: Systems & Age */}
+            {step === 5 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-text-primary">Heating & Age</h2>
@@ -245,8 +307,8 @@ export default function SurveyPage() {
               </div>
             )}
 
-            {/* Step 5: Income */}
-            {step === 5 && (
+            {/* Step 6: Income */}
+            {step === 6 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-text-primary">Impact Eligibility</h2>
