@@ -83,10 +83,6 @@ export default function DashboardPage() {
                     <h1 className="text-3xl font-bold text-text-primary tracking-tight">Your Green Roadmap</h1>
                     <p className="text-text-secondary mt-2 max-w-2xl">{summary_text}</p>
                 </div>
-                <div className="flex gap-3">
-                    <Button variant="secondary">Export PDF</Button>
-                    <Button>Update Profile</Button>
-                </div>
             </header>
 
             <main>
