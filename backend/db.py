@@ -44,8 +44,6 @@ def save_roadmap(user_id: str, roadmap: dict, summary: str = None, total_savings
         return response
     except Exception as e:
         print(f"Error saving roadmap: {e}")
-        # We don't necessarily want to fail the whole request if saving fails, but logging is good.
-        # Ideally, we should maybe re-raise or handle. For now, let's print.
         raise e
 
 def get_roadmap(user_id: str):
@@ -62,4 +60,27 @@ def get_roadmap(user_id: str):
         return None
     except Exception as e:
         print(f"Error fetching roadmap: {e}")
+        return None
+
+def save_impact(impact_data: dict):
+    try:
+        response = supabase.table("user_impact").upsert(impact_data).execute()
+        return response
+    except Exception as e:
+        print(f"Error saving impact: {e}")
+        raise e
+
+def get_impact(user_id: str):
+    try:
+        response = supabase.table("user_impact") \
+            .select("*") \
+            .eq("user_id", user_id) \
+            .limit(1) \
+            .execute()
+        
+        if response.data and len(response.data) > 0:
+            return response.data[0]
+        return None
+    except Exception as e:
+        print(f"Error fetching impact: {e}")
         return None

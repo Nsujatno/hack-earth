@@ -38,3 +38,10 @@ class AgentRoadmap(BaseModel):
     roadmap_data: dict
     summary: str | None = None
     total_savings: float | None = None
+
+
+class UserImpact(BaseModel):
+    user_id: str
+    total_co2_saved_tons: float | None = None
+    impact_summary: str | None = None
+    breakdown: dict | None = None

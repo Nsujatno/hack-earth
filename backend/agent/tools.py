@@ -97,4 +97,30 @@ def search_web(query: str) -> str:
         return "\n\n".join(context)
     except Exception as e:
         print(f"Tavily search failed: {e}")
-        return ""
+
+def calculate_co2_impact(item_name: str, monthly_savings: float) -> float:
+    """
+    Calculate annual CO2 impact in tons based on monthly dollar savings.
+    Uses approximation factors based on energy source likely replaced.
+    """
+    item_lower = item_name.lower()
+    
+    # Constants
+    LBS_PER_TON = 2000
+    
+    co2_per_dollar = 10.0
+    
+    if any(k in item_lower for k in ["insulation", "window", "door", "weatherization"]):
+        co2_per_dollar = 12.0
+    elif any(k in item_lower for k in ["heat pump", "water heater", "hvac"]):
+        co2_per_dollar = 8.0
+    elif "solar" in item_lower:
+        co2_per_dollar = 10.0
+    elif "vehicle" in item_lower or "ev" in item_lower or "charger" in item_lower:
+        co2_per_dollar = 6.0
+        
+    annual_savings = monthly_savings * 12
+    annual_co2_lbs = annual_savings * co2_per_dollar
+    annual_co2_tons = annual_co2_lbs / LBS_PER_TON
+    
+    return round(annual_co2_tons, 2)
