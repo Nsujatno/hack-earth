@@ -19,8 +19,8 @@ GreenGain is a comprehensive web application designed to help users identify, pl
 
 ### Backend
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
-- **Database**: [SQLite](https://www.sqlite.org/index.html) (via `aiosqlite`)
-- **AI Agent**: Custom agentic workflow (LangChain/LLM integration)
+- **Database**: Supabase
+- **AI Agent**: Langgraph, Gemini, OpenAI embeddings
 
 ## Getting Started
 
