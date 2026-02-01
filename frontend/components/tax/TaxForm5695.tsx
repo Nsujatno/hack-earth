@@ -19,25 +19,25 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
     const [windCost, setWindCost] = useState<number | "">("");
     const [geothermalCost, setGeothermalCost] = useState<number | "">("");
     const [batteryCost, setBatteryCost] = useState<number | "">("");
-    
+
     // Fuel Cell Logic (Lines 7a-11)
     const [fuelCellCost, setFuelCellCost] = useState<number | "">("");
     const [fuelCellCapacity, setFuelCellCapacity] = useState<number | "">(""); // in kW
 
     // --- PART II: Energy Efficient Home Improvement Credit (Annual Caps Apply) ---
-    
+
     // Section A: Envelope Improvements (Included in $1,200 Aggregate)
     const [insulationCost, setInsulationCost] = useState<number | "">("");
     const [windowsCost, setWindowsCost] = useState<number | "">("");
     const [doorsCost, setDoorsCost] = useState<number | "">("");
     const [numDoors, setNumDoors] = useState<number | "">(""); // Required for $250/door limit
-    
+
     // Section B: Residential Energy Property (Included in $1,200 Aggregate - Max $600/item)
     const [centralAirCost, setCentralAirCost] = useState<number | "">("");
     const [waterHeaterCost, setWaterHeaterCost] = useState<number | "">(""); // Gas/Oil/Propane
     const [furnaceCost, setFurnaceCost] = useState<number | "">(""); // Gas/Oil/Propane
     const [elecPanelCost, setElecPanelCost] = useState<number | "">("");
-    
+
     // Section B: Heat Pumps & Biomass (Separate $2,000 Aggregate)
     const [heatPumpCost, setHeatPumpCost] = useState<number | "">(""); // Electric/Gas Heat Pumps & HP Water Heaters
     const [biomassCost, setBiomassCost] = useState<number | "">("");
@@ -47,7 +47,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
 
     // Totals
     const [totalCredit, setTotalCredit] = useState<number>(0);
-    const [homeImprovementCredit, setHomeImprovementCredit] = useState<number>(0); 
+    const [homeImprovementCredit, setHomeImprovementCredit] = useState<number>(0);
     const [cleanEnergyCredit, setCleanEnergyCredit] = useState<number>(0);
 
     // Auto-fill effect
@@ -65,14 +65,14 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
         const windVal = Number(windCost) || 0;
         const geothermalVal = Number(geothermalCost) || 0;
         const batteryVal = Number(batteryCost) || 0;
-        
+
         // Fuel Cell Calculation: Min(30% of cost, $1,000 * kW capacity)
         const fuelCellVal = Number(fuelCellCost) || 0;
         const fuelCellCapVal = Number(fuelCellCapacity) || 0;
         const fuelCellBaseCredit = fuelCellVal * 0.30;
         const fuelCellCapLimit = fuelCellCapVal * 1000; // $500 per 0.5kW = $1000 per 1kW
-        const fuelCellCredit = (fuelCellVal > 0 && fuelCellCapVal > 0) 
-            ? Math.min(fuelCellBaseCredit, fuelCellCapLimit) 
+        const fuelCellCredit = (fuelCellVal > 0 && fuelCellCapVal > 0)
+            ? Math.min(fuelCellBaseCredit, fuelCellCapLimit)
             : 0;
 
         const part1Total = (solarElectricVal + solarWaterVal + windVal + geothermalVal + batteryVal) * 0.30 + fuelCellCredit;
@@ -80,11 +80,11 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
 
 
         // --- PART II CALCULATIONS ---
-        
+
         // 1. Envelope Improvements (Inside $1,200 Agg)
         const insulationCredit = Math.min((Number(insulationCost) || 0) * 0.30, 1200); // Max $1200 specifically for insulation
         const windowsCredit = Math.min((Number(windowsCost) || 0) * 0.30, 600); // Max $600 total
-        
+
         // Doors: Max $250 per door, Max $500 total
         const doorVal = Number(doorsCost) || 0;
         const doorCount = Number(numDoors) || 1;
@@ -105,9 +105,9 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
         const auditCredit = Math.min((Number(auditCost) || 0) * 0.30, 150);
 
         // Sum of "General" items
-        const generalSubtotal = insulationCredit + windowsCredit + doorsCredit + 
-                              centralAirCredit + waterHeaterCredit + furnaceCredit + elecPanelCredit + 
-                              auditCredit;
+        const generalSubtotal = insulationCredit + windowsCredit + doorsCredit +
+            centralAirCredit + waterHeaterCredit + furnaceCredit + elecPanelCredit +
+            auditCredit;
 
         // Apply Aggregate Limit for General Items ($1,200)
         const cappedGeneralCredit = Math.min(generalSubtotal, 1200);
@@ -217,7 +217,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                                             startAdornment="$"
                                         />
                                     </div>
-                                    
+
                                     {/* Fuel Cell Section */}
                                     <div className="p-4 bg-yellow-500/5 rounded-lg border border-yellow-500/10 mt-4">
                                         <h3 className="text-sm font-semibold text-text-primary mb-3">Qualified Fuel Cell Property</h3>
@@ -264,7 +264,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                                     </div>
                                 </div>
                                 <div className="space-y-8">
-                                    
+
                                     {/* General Bucket */}
                                     <div>
                                         <div className="bg-sub-background/50 rounded-lg p-3 text-xs text-text-secondary mb-4 flex gap-2 items-start border-l-2 border-primary">
@@ -274,7 +274,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                                                 <p>Includes Insulation, Windows, Doors, and standard Central Air/Gas Furnaces/Water Heaters.</p>
                                             </div>
                                         </div>
-                                        
+
                                         <h3 className="text-sm font-semibold text-text-primary mb-3">Envelope Improvements</h3>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                                             <Input
@@ -351,7 +351,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                                                 startAdornment="$"
                                             />
                                         </div>
-                                        
+
                                         <div className="mt-6">
                                             <Input
                                                 label="Home Energy Audit"
@@ -416,24 +416,16 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                             </div>
 
                             <div className="bg-white rounded-2xl p-6 text-text-primary shadow-sm">
-                                <div className="space-y-5 mb-8">
+                                <div className="space-y-5">
                                     <div className="flex justify-between items-baseline pb-4 border-b border-border/60">
                                         <span className="text-text-secondary font-medium">Clean Energy</span>
                                         <span className="text-xl font-bold text-text-primary">{formatCurrency(cleanEnergyCredit)}</span>
                                     </div>
-                                    <div className="flex justify-between items-baseline pb-4 border-b border-border/60">
+                                    <div className="flex justify-between items-baseline pt-2">
                                         <span className="text-text-secondary font-medium">Home Improvement</span>
                                         <span className="text-xl font-bold text-text-primary">{formatCurrency(homeImprovementCredit)}</span>
                                     </div>
                                 </div>
-
-                                <Button
-                                    variant="outline"
-                                    className="w-full rounded-full h-14 border-border text-text-secondary hover:text-text-primary hover:bg-sub-background/30 hover:border-text-secondary/30 transition-all font-medium"
-                                >
-                                    <Download size={18} className="mr-2 opacity-70" />
-                                    Download Summary
-                                </Button>
                             </div>
                         </div>
 
