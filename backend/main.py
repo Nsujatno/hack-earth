@@ -106,6 +106,31 @@ def generate_roadmap_endpoint(survey: UserSurveyInput, user = Depends(get_curren
         roadmap = result.get("final_roadmap")
         
         if roadmap:
+            recommendations = roadmap.get("recommendations", [])
+            filtered_recommendations = []
+            
+            for rec in recommendations:
+                try:
+                    roi = rec.get("roi_years")
+                    monthly_savings = rec.get("estimated_monthly_savings", 0)
+                    
+                    if roi is not None and (isinstance(roi, (int, float)) and roi > 30):
+                        continue
+                        
+                    if monthly_savings <= 0:
+                        continue
+                        
+                    filtered_recommendations.append(rec)
+                except Exception as e:
+                    print(f"Error filtering item {rec.get('name')}: {e}")
+                    continue
+            
+            roadmap["recommendations"] = filtered_recommendations
+            
+            new_total_yearly = sum(r.get("estimated_monthly_savings", 0) * 12 for r in filtered_recommendations)
+            roadmap["total_projected_savings_yearly"] = new_total_yearly
+            
+
             from db import save_roadmap
             # Extract summary and savings for easier querying
             summary_text = roadmap.get("summary_text", "")
