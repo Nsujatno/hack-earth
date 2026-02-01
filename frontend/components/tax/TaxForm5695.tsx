@@ -316,52 +316,54 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                                             </div>
                                         </div>
 
-                                        <h3 className="text-sm font-semibold text-text-primary mb-3">Standard Energy Property (Max $600 credit each)</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            <Input
-                                                label="Central Air Conditioner"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={centralAirCost}
-                                                onChange={(e) => setCentralAirCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                startAdornment="$"
-                                            />
-                                            <Input
-                                                label="Gas/Propane/Oil Water Heater"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={waterHeaterCost}
-                                                onChange={(e) => setWaterHeaterCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                startAdornment="$"
-                                            />
-                                            <Input
-                                                label="Gas/Propane/Oil Furnace/Boiler"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={furnaceCost}
-                                                onChange={(e) => setFurnaceCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                startAdornment="$"
-                                            />
-                                            <Input
-                                                label="Electrical Panel Upgrade"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={elecPanelCost}
-                                                onChange={(e) => setElecPanelCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                startAdornment="$"
-                                            />
-                                        </div>
-
-                                        <div className="mt-6">
-                                            <Input
-                                                label="Home Energy Audit"
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={auditCost}
-                                                onChange={(e) => setAuditCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                startAdornment="$"
-                                                helperText="Max credit $150"
-                                            />
+                                        {/* Standard Energy Property Bucket */}
+                                        <div className="pt-6 border-t border-border/50">
+                                            <h3 className="text-sm font-semibold text-text-primary mb-3">Standard Energy Property (Max $600 credit each)</h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                <Input
+                                                    label="Central Air Conditioner"
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={centralAirCost}
+                                                    onChange={(e) => setCentralAirCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                    startAdornment="$"
+                                                />
+                                                <Input
+                                                    label="Gas/Propane/Oil Water Heater"
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={waterHeaterCost}
+                                                    onChange={(e) => setWaterHeaterCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                    startAdornment="$"
+                                                />
+                                                <Input
+                                                    label="Gas/Propane/Oil Furnace/Boiler"
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={furnaceCost}
+                                                    onChange={(e) => setFurnaceCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                    startAdornment="$"
+                                                />
+                                                <Input
+                                                    label="Electrical Panel Upgrade"
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={elecPanelCost}
+                                                    onChange={(e) => setElecPanelCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                    startAdornment="$"
+                                                />
+                                                <div className="sm:col-span-2 mt-2">
+                                                    <Input
+                                                        label="Home Energy Audit"
+                                                        type="number"
+                                                        placeholder="0.00"
+                                                        value={auditCost}
+                                                        onChange={(e) => setAuditCost(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                        startAdornment="$"
+                                                        helperText="Max credit $150"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -409,7 +411,7 @@ export function TaxForm5695({ recommendations = [] }: TaxForm5695Props) {
                     <div className="sticky top-8 space-y-6">
                         <div className="rounded-3xl bg-primary p-6 text-white shadow-xl">
                             <div className="text-center pt-4 pb-8">
-                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2 text-primary-foreground">Total Estimated Credit</h3>
+                                <h3 className="text-xs font-bold uppercase tracking-[0.2em] opacity-80 mb-2 text-primary-foreground">Total Estimated Credit You Could EARN:</h3>
                                 <div className="text-5xl font-bold tracking-tight text-white drop-shadow-sm">
                                     {formatCurrency(totalCredit)}
                                 </div>
