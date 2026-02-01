@@ -12,14 +12,12 @@ GreenGain is a comprehensive web application designed to help users identify, pl
 ## Tech Stack
 
 ### Frontend
-- **Framework**: [Next.js](https://nextjs.org/) (React)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Charts**: [Recharts](https://recharts.org/)
+- **Framework**: Next.js (React)
+- **Styling**: Tailwind CSS
 
 ### Backend
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
-- **Database**: Supabase
+- **Framework**: FastAPI
+- **Database**: Supabase, Pinecone
 - **AI Agent**: Langgraph, Gemini, OpenAI embeddings
 
 ## Getting Started
