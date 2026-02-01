@@ -31,8 +31,8 @@ export function Sidebar() {
         {
             label: "Resources",
             items: [
-                { name: "Tax Forms", href: "/dashboard/tax-forms", icon: FileText },
                 { name: "General Info", href: "/dashboard/info", icon: Info },
+                { name: "Tax Credit Estimator", href: "/dashboard/tax-forms", icon: FileText },
             ]
         }
     ];
