@@ -85,7 +85,7 @@ export default function DashboardPage() {
                 </div>
             </header>
 
-            <main>
+            
                 <SummaryStats 
                     totalSavings={total_projected_savings_yearly} 
                     recommendationCount={recommendations.length}
