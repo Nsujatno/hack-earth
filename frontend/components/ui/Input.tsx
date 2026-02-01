@@ -6,10 +6,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   id?: string;
   startAdornment?: React.ReactNode;
   endAdornment?: React.ReactNode;
+  helperText?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, id, startAdornment, endAdornment, ...props }, ref) => {
+  ({ className, type, label, id, startAdornment, endAdornment, helperText, ...props }, ref) => {
     return (
       <div className="space-y-1.5 w-full">
         {label && (
@@ -44,6 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
         </div>
+        {helperText && <p className="text-[10px] text-text-secondary mt-1 ml-1">{helperText}</p>}
       </div>
     );
   }
