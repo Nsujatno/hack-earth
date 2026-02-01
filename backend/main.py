@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from db import supabase, get_current_user
 from models import UserCredentials, UserSurveyInput
 from fastapi import FastAPI, Depends, HTTPException
+from langchain_google_genai import ChatGoogleGenerativeAI
+import json
+import os
 
 
 app = FastAPI()
@@ -171,4 +174,133 @@ def get_dashboard_data(user = Depends(get_current_user)):
         return data
     except Exception as e:
         print(f"Dashboard Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get('/impact')
+def get_impact_endpoint(user = Depends(get_current_user)):
+    try:
+        # User extraction logic (reused)
+        if isinstance(user, tuple):
+             user_obj = user[0]
+        else:
+             user_obj = user
+
+        if hasattr(user_obj, "user") and user_obj.user:
+            user_id = user_obj.user.id
+        elif hasattr(user_obj, "id"):
+             user_id = user_obj.id
+        else:
+            raise HTTPException(status_code=400, detail=f"Could not extract user ID")
+
+        from db import get_impact
+        data = get_impact(user_id)
+        
+        if not data:
+            return {"impact_data": None}
+            
+        return data
+    except Exception as e:
+        print(f"Impact Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post('/impact/generate')
+def generate_impact_endpoint(user = Depends(get_current_user)):
+    try:
+        # User extraction logic (reused)
+        if isinstance(user, tuple):
+             user_obj = user[0]
+        else:
+             user_obj = user
+
+        if hasattr(user_obj, "user") and user_obj.user:
+            user_id = user_obj.user.id
+        elif hasattr(user_obj, "id"):
+             user_id = user_obj.id
+        else:
+            raise HTTPException(status_code=400, detail=f"Could not extract user ID")
+
+        from db import get_roadmap, save_impact
+        roadmap_row = get_roadmap(user_id)
+        if not roadmap_row:
+             raise HTTPException(status_code=404, detail="No roadmap found. Please generate a roadmap first.")
+        
+        roadmap_data = roadmap_row.get("roadmap_data", {})
+        recommendations = roadmap_data.get("recommendations", [])
+        
+        if not recommendations:
+             raise HTTPException(status_code=400, detail="Roadmap has no recommendations.")
+
+        sorted_recs = sorted(recommendations, key=lambda x: x.get("estimated_monthly_savings", 0), reverse=True)[:5]
+        
+        from agent.tools import calculate_co2_impact
+        
+        items_for_prompt = []
+        for rec in sorted_recs:
+             monthly_savings = rec.get("estimated_monthly_savings", 0)
+             name = rec.get("name")
+             
+             co2_tons = calculate_co2_impact(name, monthly_savings)
+             
+             items_for_prompt.append({
+                 "name": name,
+                 "monthly_savings": monthly_savings,
+                 "description": rec.get("explanation"),
+                 "co2_saved_tons": co2_tons
+             })
+
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash-lite",
+            temperature=0.7,
+            api_key=os.environ.get("GOOGLE_API_KEY")
+        )
+
+        prompt = f"""
+        You are an energy efficiency expert. Based on the following home upgrades and their calculated CO2 impact, generate a relatable analogy for each one.
+        
+        For each item:
+        1. Use the provided "co2_saved_tons" value. Do NOT recalculate it.
+        2. Create a fun, relatable analogy for that amount of CO2 (e.g., "driving X miles", "burning Y lbs of coal", "charging Z smartphones").
+        
+        Items:
+        {json.dumps(items_for_prompt, indent=2)}
+        
+        Return ONLY valid JSON in this format:
+        {{
+            "Item Name": {{
+                "analogy": "This is like...",
+                "co2_saved_tons": 0.5  <-- Return the exact value provided
+            }},
+            ...
+        }}
+        """
+
+        response = llm.invoke(prompt)
+        content = response.content
+        
+        # Clean up code blocks if present
+        if "```json" in content:
+            content = content.replace("```json", "").replace("```", "")
+        elif "```" in content:
+            content = content.replace("```", "")
+            
+        impact_breakdown = json.loads(content)
+        
+        # Calculate total
+        total_co2 = sum(item.get("co2_saved_tons", 0) for item in impact_breakdown.values())
+        
+        impact_data = {
+            "user_id": user_id,
+            "total_co2_saved_tons": total_co2,
+            "impact_summary": f"You could save {total_co2:.1f} tons of CO2 annually!",
+            "breakdown": impact_breakdown
+        }
+        
+        save_impact(impact_data)
+        
+        return impact_data
+
+    except Exception as e:
+        print(f"Impact Generation Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
