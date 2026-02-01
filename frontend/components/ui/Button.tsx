@@ -14,6 +14,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-sub-background text-text-secondary hover:text-text-primary",
         link: "text-primary underline-offset-4 hover:underline",
         success: "bg-success text-success-foreground hover:opacity-90 shadow-sm",
+        outline: "border border-border bg-transparent hover:bg-sub-background text-text-primary",
       },
       size: {
         default: "h-11 px-6 py-2.5 rounded-xl text-sm",
@@ -35,7 +36,7 @@ const buttonVariants = cva(
 
 interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
