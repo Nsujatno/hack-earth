@@ -1,6 +1,5 @@
 "use client";
 
-import { mockRoadmapData } from "@/lib/mockData";
 import { SummaryStats } from "@/components/dashboard/SummaryStats";
 import { ComponentRecommendationStack } from "@/components/dashboard/ComponentRecommendationStack";
 import { Button } from "@/components/ui/Button";
